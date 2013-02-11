@@ -49,11 +49,17 @@ NS_ENUM(NSUInteger, KGModalBackgroundDisplayStyle){
 // Set the content view to display in the modal and whether the modal should animate in
 - (void)showWithContentView:(UIView *)contentView andAnimated:(BOOL)animated;
 
+// Set the content view to display in the modal and whether the modal should animate in and hide the modal after the specified timeout value
+- (void)showWithContentView:(UIView *)contentView andAnimated:(BOOL)animated andHideAfter:(NSTimeInterval)timeout;
+
 // Set the content view controller to display in the modal and display with animations
 - (void)showWithContentViewController:(UIViewController *)contentViewController;
 
 // Set the content view controller to display in the modal and whether the modal should animate in
 - (void)showWithContentViewController:(UIViewController *)contentViewController andAnimated:(BOOL)animated;
+
+// Set the content view controller to display in the modal and whether the modal should animate in and  hide the modal after the specified timeout value
+- (void)showWithContentViewController:(UIViewController *)contentViewController andAnimated:(BOOL)animated andHideAfter:(NSTimeInterval)timeout;
 
 // Hide the modal with animations
 - (void)hide;

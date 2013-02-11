@@ -35,6 +35,7 @@ NSString *const KGModalGradientViewTapped = @"KGModalGradientViewTapped";
 @property (weak, nonatomic) KGModalContainerView *containerView;
 @property (weak, nonatomic) KGModalCloseButton *closeButton;
 @property (weak, nonatomic) UIView *contentView;
+@property (strong, nonatomic) NSTimer *timer;
 
 @end
 
@@ -79,11 +80,19 @@ NSString *const KGModalGradientViewTapped = @"KGModalGradientViewTapped";
 }
 
 - (void)showWithContentViewController:(UIViewController *)contentViewController andAnimated:(BOOL)animated{
+    [self showWithContentViewController:contentViewController andAnimated:animated andHideAfter:0];
+}
+
+- (void)showWithContentViewController:(UIViewController *)contentViewController andAnimated:(BOOL)animated andHideAfter:(NSTimeInterval)timeout{
     self.contentViewController = contentViewController;
-    [self showWithContentView:contentViewController.view andAnimated:YES];
+    [self showWithContentView:contentViewController.view andAnimated:YES andHideAfter:timeout];
 }
 
 - (void)showWithContentView:(UIView *)contentView andAnimated:(BOOL)animated{
+    [self showWithContentView:contentView andAnimated:animated andHideAfter:0];
+}
+
+- (void)showWithContentView:(UIView *)contentView andAnimated:(BOOL)animated andHideAfter:(NSTimeInterval)timeout{
     UIWindow *window = [[UIApplication sharedApplication] keyWindow];
     KGModalViewController *viewController = [[KGModalViewController alloc] init];
     [window addSubview:viewController.view];
@@ -134,10 +143,18 @@ NSString *const KGModalGradientViewTapped = @"KGModalGradientViewTapped";
                     containerView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
                 } completion:^(BOOL finished2){
                     containerView.layer.shouldRasterize = NO;
+                    if (timeout > 0){
+                        [self setTimer:[NSTimer scheduledTimerWithTimeInterval:timeout target:self selector:@selector(timerDidFire) userInfo:nil repeats:NO]];
+                    }
                 }];
             }];
         }
     });
+}
+
+- (void)timerDidFire{
+    [self setTimer:nil];
+    [self hideAnimated:self.animateWhenDismissed];
 }
 
 - (void)closeAction:(id)sender{
@@ -197,6 +214,10 @@ NSString *const KGModalGradientViewTapped = @"KGModalGradientViewTapped";
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self.containerView removeFromSuperview];
     self.contentViewController = nil;
+    if(self.timer) {
+        [self.timer invalidate];
+        [self setTimer:nil];
+    }
 }
 
 - (void)setModalBackgroundColor:(UIColor *)modalBackgroundColor{
